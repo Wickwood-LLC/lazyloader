@@ -1,0 +1,12 @@
+/* $Id$ */
+
+/**
+ * @file
+ * Lazyloader
+ *
+ * @author: Daniel Honrade http://drupal.org/user/351112
+ *
+ */
+ 
+img[actual-src] {} 
+.lazyloader-wait { position: absolute; z-index: 200; } 
