@@ -53,8 +53,12 @@
     
   // Check if the images are within the window view
   function windowView(image, settings){
-    var view = $(window).height() + $(window).scrollTop(), image_pos = $(image).offset();     
-    return view >= (image_pos.top - settings['distance']);
+    var windowHeight = $(window).height(),
+        windowBottom = windowHeight + $(window).scrollTop(), 
+        windowTop    = windowBottom - windowHeight,
+        imagePos     = $(image).offset().top - settings['distance'];
+
+    return ((windowBottom >= imagePos) && (windowTop <= imagePos));
   };
     
     
