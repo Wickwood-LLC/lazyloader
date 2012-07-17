@@ -7,4 +7,94 @@
  *
  * @author: Daniel Honrade http://drupal.org/user/351112
  *
+ * Note: Obviously, this will not work unless the javascript is on.
+ *
  */
+
+/**
+ * TO DO:
+ * - based on visibility, ex. slideshow
+ *  
+ *
+ */ 
+
+/*
+ * Implements hook_theme_registry_alter
+ */
+function lazyloader_theme_registry_alter(&$theme_registry) {
+  //if (variable_get('lazyloader_image', 0)) {
+    $theme_registry['image']['function'] = 'lazyloader_image';
+  //}
+  return $theme_registry;
+}
+
+
+ 
+/**
+ * Returns HTML for an image.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - path: Either the path of the image file (relative to base_path()) or a
+ *     full URL.
+ *   - width: The width of the image (if known).
+ *   - height: The height of the image (if known).
+ *   - alt: The alternative text for text-based browsers. HTML 4 and XHTML 1.0
+ *     always require an alt attribute. The HTML 5 draft allows the alt
+ *     attribute to be omitted in some cases. Therefore, this variable defaults
+ *     to an empty string, but can be set to NULL for the attribute to be
+ *     omitted. Usually, neither omission nor an empty string satisfies
+ *     accessibility requirements, so it is strongly encouraged for code calling
+ *     theme('image') to pass a meaningful value for this variable.
+ *     - http://www.w3.org/TR/REC-html40/struct/objects.html#h-13.8
+ *     - http://www.w3.org/TR/xhtml1/dtds.html
+ *     - http://dev.w3.org/html5/spec/Overview.html#alt
+ *   - title: The title text is displayed when the image is hovered in some
+ *     popular browsers.
+ *   - attributes: Associative array of attributes to be placed in the img tag.
+ */
+function lazyloader_image($variables) {
+
+  // path to dummy placeholder image, to be replaced by actual image
+  $image_placeholder_path = drupal_get_path('module', 'lazyloader');
+  
+  $attributes = $variables['attributes'];
+  
+  $attributes['actual-src'] = file_create_url($variables['path']);
+  $attributes['src'] = base_path() . $image_placeholder_path . '/image_placeholder.gif';
+  
+  foreach (array('width', 'height', 'alt', 'title') as $key) {
+    if (isset($variables[$key])) {
+      $attributes[$key] = $variables[$key];
+    }
+  }
+
+  return '<img' . drupal_attributes($attributes) . ' />';
+}
+
+
+/**
+ * Implementation of hook_process_html()
+ *
+ * Adds Maximenu floating menus in $page_bottom variable
+ *
+ */
+function lazyloader_process_html(&$vars) {
+
+  $distance = 0;
+  
+  $lazyloader_init = '
+    <script type="text/javascript">
+      jQuery(function($){
+        $("img[actual-src]").lazyloader({distance: ' . $distance . '});
+      });
+    </script>';
+
+  $vars['page_bottom'] .= $lazyloader_init;
+
+}
+
+
+
+
+

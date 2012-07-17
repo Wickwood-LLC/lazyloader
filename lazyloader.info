@@ -2,6 +2,7 @@ name = Lazyloader
 package = Image
 description = "Automatically lazyload images on windows scroll, makes sites with multiple images load faster."
 core = "7.x"
+dependencies[] = image
 files[] = lazyloader.install
 files[] = lazyloader.module
 files[] = lazyloader.admin.inc

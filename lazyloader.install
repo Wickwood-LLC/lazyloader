@@ -1,0 +1,19 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Install script to install the Lazyloader
+ *
+ * @author: Daniel Honrade http://drupal.org/user/351112
+ *
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function lazyloader_install() {
+  // Make sure this module called last
+  // to override any form provided by other modules
+  db_query("UPDATE {system} SET weight = 3000 WHERE name = 'lazyloader'");
+}
