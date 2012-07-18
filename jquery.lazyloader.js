@@ -16,7 +16,7 @@
     var images = this;
     
     // add the wait icon
-    $('img[actual-src]').parent().css({ position: 'relative', display: 'block'}).prepend('<img class="lazyloader-wait" src="' + settings['icon'] + '" />');
+    $('img[data-src]').parent().css({ position: 'relative', display: 'block'}).prepend('<img class="lazyloader-wait" src="' + settings['icon'] + '" />');
                      
     // Load on refresh
     loadActualImages(images, settings);
@@ -43,7 +43,7 @@
       var waitTop = Math.round(imageHeight/2), waitLeft = Math.round(imageWidth/2), waitFactor = Math.round($(this).siblings('.lazyloader-wait').height()/2);
       $(this).siblings('.lazyloader-wait').css({ top: waitTop - waitFactor, left: waitLeft - waitFactor });
       
-      if (windowView(this, settings) && ($(this).attr('actual-src'))){
+      if (windowView(this, settings) && ($(this).attr('data-src'))){
         loadImage(this);
         $(this).fadeIn('slow');
       }
@@ -64,7 +64,7 @@
     
   // Load the image
   function loadImage(image){
-    $(image).hide().attr('src', $(image).attr('actual-src')).removeAttr('actual-src');
+    $(image).hide().attr('src', $(image).data('src')).removeAttr('data-src');
     $(image).load(function(){
       $(this).siblings('img.lazyloader-wait').remove();
     });

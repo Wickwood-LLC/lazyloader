@@ -8,5 +8,5 @@
  *
  */
  
-img[actual-src] {} 
+img[data-src] {} 
 .lazyloader-wait { position: absolute; z-index: 200; } 

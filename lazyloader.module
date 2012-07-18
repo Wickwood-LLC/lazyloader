@@ -57,7 +57,7 @@ function lazyloader_image($variables) {
 
   $attributes = $variables['attributes'];
   
-  $attributes['actual-src'] = file_create_url($variables['path']);
+  $attributes['data-src'] = file_create_url($variables['path']);
 
   // path to dummy placeholder image, to be replaced by actual image   
   $attributes['src'] = LAZYLOADER_PATH . '/image_placeholder.gif';
@@ -86,7 +86,7 @@ function lazyloader_process_html(&$vars) {
   $lazyloader_init = '
     <script type="text/javascript">
       jQuery(function($){
-        $("img[actual-src]").lazyloader({distance: ' . $distance . ', icon: "' . $icon . '" });
+        $("img[data-src]").lazyloader({distance: ' . $distance . ', icon: "' . $icon . '" });
       });
     </script>';
 
