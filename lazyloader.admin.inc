@@ -73,7 +73,9 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
     '#type'          => 'textarea',
     '#title'         => t('Excluded Pages'),
     '#default_value' => $settings['exclude'],
-    '#description'   => t('List the page paths to be excluded from lazyloading on each line.'),                   
+    '#description'   => t('List the page paths to be excluded from lazyloading on each line. 
+                           This is useful when you want to redirect your user with disabled javascript browser 
+                           on pages with the same content but not using image lazyloading.'),                   
     '#prefix'        => '<div class="lazy-column lazy-column-2">',
     '#suffix'        => '</div></div>',
   ); 
