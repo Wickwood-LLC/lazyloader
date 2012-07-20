@@ -23,7 +23,7 @@ function lazyloader_init() {
     'enabled'     => 1,
     'distance'    => 0,
     'loader_icon' => 7,
-    'placeholder' => LAZYLOADER_PATH . '/image_placeholder.gif',
+    'placeholder' => '',
     'exclude'     => '',
   );
 }
@@ -112,7 +112,7 @@ function lazyloader_image($variables) {
     $attributes['data-src'] = file_create_url($variables['path']);
 
     // path to dummy placeholder image, to be replaced by actual image   
-    $image_placeholder = !empty($settings['placeholder']) ? base_path() . $settings['placeholder']: $_lazyloader_defaults['placeholder'];
+    $image_placeholder = !empty($settings['placeholder']) ? base_path() . $settings['placeholder']: LAZYLOADER_PATH . '/image_placeholder.gif';
     $attributes['src'] = $image_placeholder;
   }
   else {

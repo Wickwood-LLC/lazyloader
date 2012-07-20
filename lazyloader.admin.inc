@@ -91,10 +91,16 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
  *
  */
 function lazyloader_admin_submit($form, $form_state) {
-  //dsm($form);
+  global $_lazyloader_defaults;
   $form_values = $form_state['values'];
-  $settings = $form_values['lazyloader'];
-  variable_set('lazyloader', $settings);
+  //dsm($form_state);  
+  if ($form_values['op'] == 'Save') {
+    $settings = $form_values['lazyloader'];
+  }
+  elseif ($form_values['op'] == 'Reset') {
+    $settings = $_lazyloader_defaults;  
+  }
+  variable_set('lazyloader', $settings);  
 }
 
 
