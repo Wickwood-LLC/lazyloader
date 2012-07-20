@@ -25,7 +25,12 @@
     $(window).bind('scroll', function(e){
       loadActualImages(images, settings);
     }); 
-       
+
+    // Load on resize
+    $(window).resize(function(e){
+      loadActualImages(images, settings);
+    }); 
+           
     return this;
   };
     
