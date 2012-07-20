@@ -12,11 +12,13 @@
  */
 define('LAZYLOADER_PATH', base_path() . drupal_get_path('module', 'lazyloader'));
 
+
 /**
  * Implementation of hook_init().
  *
  */
 function lazyloader_init() {
+
   global $_lazyloader_defaults;
    
   $_lazyloader_defaults = array(
@@ -27,6 +29,7 @@ function lazyloader_init() {
     'exclude'     => '',
   );
 }
+
 
 /**
  * Implementation of hook_menu().
@@ -55,6 +58,7 @@ function lazyloader_menu() {
  *
  */
 function lazyloader_permission() {
+
   return array(
     'administer lazyloader' => array(
       'title' => t('Administer Lazyloader'), 
@@ -68,15 +72,17 @@ function lazyloader_permission() {
  * Implements hook_theme_registry_alter
  */
 function lazyloader_theme_registry_alter(&$theme_registry) {
+
   global $_lazyloader_defaults;
+  
   $settings = variable_get('lazyloader', $_lazyloader_defaults);
 
   if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
     $theme_registry['image']['function'] = 'lazyloader_image';
   }
+  
   return $theme_registry;
 }
-
 
  
 /**
@@ -103,25 +109,28 @@ function lazyloader_theme_registry_alter(&$theme_registry) {
  *   - attributes: Associative array of attributes to be placed in the img tag.
  */
 function lazyloader_image($variables) {
+
   global $_lazyloader_defaults;
+  
   $settings = variable_get('lazyloader', $_lazyloader_defaults);
   
   $attributes = $variables['attributes'];
 
-  if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {  
+  if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) { 
+   
     $attributes['data-src'] = file_create_url($variables['path']);
 
     // path to dummy placeholder image, to be replaced by actual image   
     $image_placeholder = !empty($settings['placeholder']) ? base_path() . $settings['placeholder']: LAZYLOADER_PATH . '/image_placeholder.gif';
+    
     $attributes['src'] = $image_placeholder;
   }
   else {
     $attributes['src'] = file_create_url($variables['path']);  
   }
+  
   foreach (array('width', 'height', 'alt', 'title') as $key) {
-    if (isset($variables[$key])) {
-      $attributes[$key] = $variables[$key];
-    }
+    if (isset($variables[$key])) $attributes[$key] = $variables[$key];
   }
 
   return '<img' . drupal_attributes($attributes) . ' />';
@@ -135,10 +144,13 @@ function lazyloader_image($variables) {
  *
  */
 function lazyloader_process_html(&$vars) {
+
   global $_lazyloader_defaults;
+  
   $settings = variable_get('lazyloader', $_lazyloader_defaults);
 
   if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
+  
     $icon = LAZYLOADER_PATH . '/loader/loader-' . $settings['loader_icon'] . '.gif';
 
     $lazyloader_init = '

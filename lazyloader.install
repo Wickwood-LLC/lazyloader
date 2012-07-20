@@ -8,6 +8,7 @@
  * @author: Daniel Honrade http://drupal.org/user/351112
  *
  */
+ 
 
 /**
  * Implementation of hook_install().
@@ -17,6 +18,7 @@ function lazyloader_install() {
   // to override any form provided by other modules
   db_query("UPDATE {system} SET weight = 3000 WHERE name = 'lazyloader'");
 }
+
 
 /**
  * Implementation of hook_uninstall().

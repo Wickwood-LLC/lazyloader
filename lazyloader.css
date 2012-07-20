@@ -7,9 +7,12 @@
  * @author: Daniel Honrade http://drupal.org/user/351112
  *
  */
- 
+
+/* Lazyloader Render */ 
 img[data-src] {} 
 .lazyloader-icon { position: absolute; z-index: 200; } 
+
+/* Lazyloader Admin UI */
 #edit-lazyloader .lazy-columns {}
 #edit-lazyloader .lazy-column { width: 49%;}
 #edit-lazyloader .lazy-column-1 { float: left; }

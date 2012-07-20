@@ -51,14 +51,27 @@
   };
         
     
-  // Check if the images are within the window view
+  // Check if the images are within the window view (top, bottom, left and right)
   function windowView(image, settings){
     var windowHeight = $(window).height(),
         windowBottom = windowHeight + $(window).scrollTop(), 
         windowTop    = windowBottom - windowHeight,
-        imagePos     = $(image).offset().top - settings['distance'];
 
-    return ((windowBottom >= imagePos) && (windowTop <= imagePos));
+        windowWidth  = $(window).width(),
+        windowRight  = windowWidth + $(window).scrollLeft(),
+        windowLeft   = windowRight - windowWidth,
+
+        imageHeight  = $(image).height(),
+        imageWidth   = $(image).width(),
+
+        imageTop     = $(image).offset().top - settings['distance'],
+        imageBottom  = imageTop + imageHeight + settings['distance'],
+        imageLeft    = $(image).offset().left - settings['distance'];
+        imageRight   = imageLeft + imageWidth + settings['distance'];
+           
+           // This will return true if any corner of the image is within the screen 
+    return (((windowBottom >= imageTop) && (windowTop <= imageTop)) || ((windowBottom >= imageBottom) && (windowTop <= imageBottom))) && 
+           (((windowRight >= imageLeft) && (windowLeft <= imageLeft)) || ((windowRight >= imageRight) && (windowLeft <= imageRight)));
   };
     
     

@@ -44,14 +44,14 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
     '#default_value' => $settings['distance'],
     '#size'          => 5, 
     '#maxlength'     => 5,
-    '#description'   => t('The distance (in pixels) of image to the viewable browser window, which will trigger the loading of the actual image.'),                   
+    '#description'   => t('The distance (in pixels) of image to the viewable browser window before it loads the actual image.'),                   
   );
 
   $form['lazyloader']['placeholder'] = array(
     '#type'          => 'textfield',
     '#title'         => t('Placeholder Image'),
     '#default_value' => $settings['placeholder'],
-    '#description'   => t('Path to your placeholder image, ex. sites/default/files/placeholder_image.gif. Leave it blank to use the default.'),                   
+    '#description'   => t('Path to your placeholder image, ex. sites/default/files/placeholder_image.gif. Leave it blank to use the default image.'),                   
   );
   
   $loader_dir = base_path() . drupal_get_path('module', 'lazyloader') . '/loader/';
@@ -91,15 +91,18 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
  *
  */
 function lazyloader_admin_submit($form, $form_state) {
+
   global $_lazyloader_defaults;
+  
   $form_values = $form_state['values'];
-  //dsm($form_state);  
+
   if ($form_values['op'] == 'Save') {
-    $settings = $form_values['lazyloader'];
+    $settings = $form_values['lazyloader']; // save user settings
   }
   elseif ($form_values['op'] == 'Reset') {
-    $settings = $_lazyloader_defaults;  
+    $settings = $_lazyloader_defaults;      // save default settings
   }
+  
   variable_set('lazyloader', $settings);  
 }
 
