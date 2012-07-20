@@ -11,18 +11,67 @@
  *
  */
 define('LAZYLOADER_PATH', base_path() . drupal_get_path('module', 'lazyloader'));
+
 /**
- * TO DO:
- * - Admin UI
- *  
+ * Implementation of hook_init().
  *
- */ 
+ */
+function lazyloader_init() {
+  global $_lazyloader_defaults;
+   
+  $_lazyloader_defaults = array(
+    'enabled'     => 1,
+    'distance'    => 0,
+    'loader_icon' => 7,
+    'placeholder' => LAZYLOADER_PATH . '/image_placeholder.gif',
+    'exclude'     => '',
+  );
+}
+
+/**
+ * Implementation of hook_menu().
+ *
+ */
+function lazyloader_menu() {
+  
+  $items = array();  
+  
+  $items['admin/config/media/lazyloader'] = array(
+    'title' => 'Lazyloader',
+    'page callback' => 'drupal_get_form',
+    'access callback' => 'user_access', 
+    'access arguments' => array('administer lazyloader'),
+    'page arguments' => array('lazyloader_admin', NULL),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'lazyloader.admin.inc',
+    'description' => 'Configure Lazyloader',    
+  );
+  return $items;
+}
+
+
+/**
+ * Implementation of hook_perm().
+ *
+ */
+function lazyloader_permission() {
+  return array(
+    'administer lazyloader' => array(
+      'title' => t('Administer Lazyloader'), 
+      'description' => t('Perform administration tasks for Lazyloader.'),
+    ),
+  );
+}
+
 
 /*
  * Implements hook_theme_registry_alter
  */
 function lazyloader_theme_registry_alter(&$theme_registry) {
-  if (variable_get('lazyloader_image', 1)) {
+  global $_lazyloader_defaults;
+  $settings = variable_get('lazyloader', $_lazyloader_defaults);
+
+  if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
     $theme_registry['image']['function'] = 'lazyloader_image';
   }
   return $theme_registry;
@@ -54,14 +103,21 @@ function lazyloader_theme_registry_alter(&$theme_registry) {
  *   - attributes: Associative array of attributes to be placed in the img tag.
  */
 function lazyloader_image($variables) {
-
+  global $_lazyloader_defaults;
+  $settings = variable_get('lazyloader', $_lazyloader_defaults);
+  
   $attributes = $variables['attributes'];
-  
-  $attributes['data-src'] = file_create_url($variables['path']);
 
-  // path to dummy placeholder image, to be replaced by actual image   
-  $attributes['src'] = LAZYLOADER_PATH . '/image_placeholder.gif';
-  
+  if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {  
+    $attributes['data-src'] = file_create_url($variables['path']);
+
+    // path to dummy placeholder image, to be replaced by actual image   
+    $image_placeholder = !empty($settings['placeholder']) ? base_path() . $settings['placeholder']: $_lazyloader_defaults['placeholder'];
+    $attributes['src'] = $image_placeholder;
+  }
+  else {
+    $attributes['src'] = file_create_url($variables['path']);  
+  }
   foreach (array('width', 'height', 'alt', 'title') as $key) {
     if (isset($variables[$key])) {
       $attributes[$key] = $variables[$key];
@@ -79,19 +135,21 @@ function lazyloader_image($variables) {
  *
  */
 function lazyloader_process_html(&$vars) {
+  global $_lazyloader_defaults;
+  $settings = variable_get('lazyloader', $_lazyloader_defaults);
 
-  $distance = 0;
-  $icon = LAZYLOADER_PATH . '/images/loader-5.gif';
+  if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
+    $icon = LAZYLOADER_PATH . '/loader/loader-' . $settings['loader_icon'] . '.gif';
 
-  $lazyloader_init = '
-    <script type="text/javascript">
-      jQuery(function($){
-        $("img[data-src]").lazyloader({distance: ' . $distance . ', icon: "' . $icon . '" });
-      });
-    </script>';
+    $lazyloader_init = '
+      <script type="text/javascript">
+        jQuery(function($){
+          $("img[data-src]").lazyloader({distance: ' . $settings['distance'] . ', icon: "' . $icon . '" });
+        });
+      </script>';
 
-  $vars['page_bottom'] .= $lazyloader_init;
-
+    $vars['page_bottom'] .= $lazyloader_init;
+  }
 }
 
 
