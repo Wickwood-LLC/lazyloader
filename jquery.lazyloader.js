@@ -58,20 +58,23 @@
     
   // Check if the images are within the window view (top, bottom, left and right)
   function windowView(image, settings){
+  
+        // window variables
     var windowHeight = $(window).height(),
+        windowWidth  = $(window).width(),
+        
         windowBottom = windowHeight + $(window).scrollTop(), 
         windowTop    = windowBottom - windowHeight,
-
-        windowWidth  = $(window).width(),
         windowRight  = windowWidth + $(window).scrollLeft(),
         windowLeft   = windowRight - windowWidth,
-
+        
+        // image variables
         imageHeight  = $(image).height(),
         imageWidth   = $(image).width(),
 
         imageTop     = $(image).offset().top - settings['distance'],
         imageBottom  = imageTop + imageHeight + settings['distance'],
-        imageLeft    = $(image).offset().left - settings['distance'];
+        imageLeft    = $(image).offset().left - settings['distance'],
         imageRight   = imageLeft + imageWidth + settings['distance'];
            
            // This will return true if any corner of the image is within the screen 
