@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Lazyloader
+ * Lazyloader Module
  *
  * @author: Daniel Honrade http://drupal.org/user/351112
  *
@@ -12,7 +12,9 @@ define('LAZYLOADER_PATH', base_path() . drupal_get_path('module', 'lazyloader'))
 
 
 /**
- * Implementation of hook_init().
+ * Implements hook_init().
+ *
+ * Sets the defaults global 
  *
  */
 function lazyloader_init() {
@@ -20,17 +22,17 @@ function lazyloader_init() {
   global $_lazyloader_defaults;
    
   $_lazyloader_defaults = array(
-    'enabled'     => 1,
-    'distance'    => 0,
-    'loader_icon' => 7,
-    'placeholder' => '',
-    'exclude'     => '',
+    'enabled'     => 1,  // always enabled by default
+    'distance'    => 0,  // 0 pixel distance to the viewable browser window before the actual image is loaded
+    'loader_icon' => 7,  // default loader icon
+    'placeholder' => '', // stand-in image before the actual image gets loaded
+    'exclude'     => '', // pages to exclude from lazyloader
   );
 }
 
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  *
  */
 function lazyloader_menu() {
@@ -52,7 +54,7 @@ function lazyloader_menu() {
 
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_perm().
  *
  */
 function lazyloader_permission() {
@@ -67,7 +69,7 @@ function lazyloader_permission() {
 
 
 /*
- * Implements hook_theme_registry_alter
+ * Implements hook_theme_registry_alter()
  */
 function lazyloader_theme_registry_alter(&$theme_registry) {
 
@@ -136,7 +138,7 @@ function lazyloader_image($variables) {
 
 
 /**
- * Implementation of hook_process_html()
+ * Implements hook_process_html()
  *
  * Initialize the trigger for lazyloader
  *

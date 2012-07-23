@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Lazyloader
+ * Lazyloader Admin
  *
  * @author: Daniel Honrade http://drupal.org/user/351112
  *
