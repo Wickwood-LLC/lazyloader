@@ -1,6 +1,4 @@
 <?php
-// $Id$
-
 /**
  * @file
  * Install script to install the Lazyloader
@@ -8,7 +6,7 @@
  * @author: Daniel Honrade http://drupal.org/user/351112
  *
  */
- 
+
 
 /**
  * Implementation of hook_install().
@@ -26,4 +24,3 @@ function lazyloader_install() {
 function lazyloader_uninstall() {
   variable_del('lazyloader');
 }
-
