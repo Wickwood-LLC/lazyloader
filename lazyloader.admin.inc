@@ -6,16 +6,16 @@
  * @author: Daniel Honrade http://drupal.org/user/351112
  *
  */
- 
+
 /**
  * Admin Form: UI
  *
  */
 function lazyloader_admin($form, &$form_state, $op = NULL) {
 
-  global $_lazyloader_defaults;
+  global $_lazyloader_set;
 
-  $settings = variable_get('lazyloader', $_lazyloader_defaults);
+  $settings = $_lazyloader_set;
 
   $form = array();
 
@@ -34,7 +34,7 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
     '#default_value' => $settings['enabled'],
     '#description'   => t('Enable/Disable Lazyloader (Useful for testing)'),
     '#prefix'        => '<div class="lazy-columns clearfix"><div class="lazy-column lazy-column-1">',
-  );   
+  );
 
   $form['lazyloader']['distance'] = array(
     '#type'          => 'textfield',
@@ -57,7 +57,7 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
   for ($i = 1; $i <= 8; $i++) {
     $loader[$i] = '<img alt="Lazyloader Icon" src="' . $loader_dir . 'loader-' . $i . '.gif" />';
   }
-  
+
   $form['lazyloader']['loader_icon'] = array(
     '#type'          => 'radios',
     '#title'         => t('Loader Icon'),
@@ -71,7 +71,7 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
     '#type'          => 'textarea',
     '#title'         => t('Excluded Pages'),
     '#default_value' => $settings['exclude'],
-    '#description'   => t('List the page paths to be excluded from lazyloading on each line. This is useful when you want to redirect your user with disabled javascript browser on pages with the same content but not using image lazyloading.'),                   
+    '#description'   => t('List the page paths to be excluded from lazyloading on each line. This is useful when you want to redirect your user with disabled javascript browser on pages with the same content but not using image lazyloading. Ex. node/1'),
     '#prefix'        => '<div class="lazy-column lazy-column-2">',
     '#suffix'        => '</div></div>',
   );

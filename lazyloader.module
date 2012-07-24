@@ -14,13 +14,16 @@ define('LAZYLOADER_PATH', base_path() . drupal_get_path('module', 'lazyloader'))
 /**
  * Implements hook_init().
  *
- * Sets the defaults global 
+ * Sets the defaults global
  *
  */
 function lazyloader_init() {
 
   global $_lazyloader_defaults;
-   
+  global $_lazyloader_set;
+
+  $_lazyloader_set = variable_get('lazyloader', $_lazyloader_defaults);
+
   $_lazyloader_defaults = array(
     'enabled'     => 1,  // always enabled by default
     'distance'    => 0,  // 0 pixel distance to the viewable browser window before the actual image is loaded
@@ -40,7 +43,7 @@ function lazyloader_menu() {
   $items = array();
 
   $items['admin/config/media/lazyloader'] = array(
-    'title' => 'Lazyloader',
+    'title' => 'Image Lazyloader',
     'page callback' => 'drupal_get_form',
     'access callback' => 'user_access',
     'access arguments' => array('administer lazyloader'),
@@ -69,22 +72,22 @@ function lazyloader_permission() {
 
 
 /*
- * Implements hook_theme_registry_alter()
+ * Implements hook_theme_registry_alter().
  */
 function lazyloader_theme_registry_alter(&$theme_registry) {
 
-  global $_lazyloader_defaults;
+  global $_lazyloader_set;
 
-  $settings = variable_get('lazyloader', $_lazyloader_defaults);
+  $settings = $_lazyloader_set;
 
   if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
     $theme_registry['image']['function'] = 'lazyloader_image';
   }
-  
+
   return $theme_registry;
 }
 
- 
+
 /**
  * Returns HTML for an image.
  *
@@ -110,9 +113,9 @@ function lazyloader_theme_registry_alter(&$theme_registry) {
  */
 function lazyloader_image($variables) {
 
-  global $_lazyloader_defaults;
+  global $_lazyloader_set;
 
-  $settings = variable_get('lazyloader', $_lazyloader_defaults);
+  $settings = $_lazyloader_set;
 
   $attributes = $variables['attributes'];
 
@@ -121,7 +124,7 @@ function lazyloader_image($variables) {
     $attributes['data-src'] = file_create_url($variables['path']);
 
     // path to dummy placeholder image, to be replaced by actual image
-    $image_placeholder = !empty($settings['placeholder']) ? base_path() . $settings['placeholder']: LAZYLOADER_PATH . '/image_placeholder.gif';
+    $image_placeholder = !empty($settings['placeholder']) ? base_path() . trim($settings['placeholder']): LAZYLOADER_PATH . '/image_placeholder.gif';
 
     $attributes['src'] = $image_placeholder;
   }
@@ -138,25 +141,25 @@ function lazyloader_image($variables) {
 
 
 /**
- * Implements hook_process_html()
+ * Implements hook_process_html().
  *
  * Initialize the trigger for lazyloader
  *
  */
 function lazyloader_process_html(&$vars) {
 
-  global $_lazyloader_defaults;
+  global $_lazyloader_set;
 
-  $settings = variable_get('lazyloader', $_lazyloader_defaults);
+  $settings = $_lazyloader_set;
 
   if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
 
-    $icon = LAZYLOADER_PATH . '/loader/loader-' . $settings['loader_icon'] . '.gif';
+    $icon = LAZYLOADER_PATH . '/loader/loader-' . trim($settings['loader_icon']) . '.gif';
 
     $lazyloader_init = '
       <script type="text/javascript">
         jQuery(function($){
-          $("img[data-src]").lazyloader({distance: ' . $settings['distance'] . ', icon: "' . $icon . '" });
+          $("img[data-src]").lazyloader({distance: ' . trim($settings['distance']) . ', icon: "' . $icon . '" });
         });
       </script>';
 

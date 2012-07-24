@@ -1,7 +1,7 @@
 ; @author: Daniel Honrade http://drupal.org/user/351112
 
-name = Lazyloader
-package = Image
+name = Image Lazyloader
+package = Lazyloader
 description = "Automatically lazyload images on windows scroll, makes sites with multiple images load faster."
 core = "7.x"
 dependencies[] = image
