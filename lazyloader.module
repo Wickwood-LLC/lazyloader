@@ -154,7 +154,7 @@ function lazyloader_process_html(&$vars) {
 
   if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
 
-    $icon = LAZYLOADER_PATH . '/loader/loader-' . trim($settings['loader_icon']) . '.gif';
+    $icon = ($settings['loader_icon'] != 0) ? LAZYLOADER_PATH . '/loader/loader-' . $settings['loader_icon'] . '.gif': '';
 
     $lazyloader_init = '
       <script type="text/javascript">

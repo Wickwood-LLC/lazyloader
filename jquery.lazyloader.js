@@ -18,7 +18,7 @@
     var images = this;
 
     // add the loader icon
-    $('img[data-src]').parent().css({ position: 'relative', display: 'block'}).prepend('<img class="lazyloader-icon" src="' + settings['icon'] + '" />');
+    if(settings['icon'] != '') $('img[data-src]').parent().css({ position: 'relative', display: 'block'}).prepend('<img class="lazyloader-icon" src="' + settings['icon'] + '" />');
 
     // Load on refresh
     loadActualImages(images, settings);
