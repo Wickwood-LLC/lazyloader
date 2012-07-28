@@ -118,7 +118,8 @@ function lazyloader_image($variables) {
   $settings = $_lazyloader_set;
 
   $attributes = $variables['attributes'];
-
+  $noscript_attributes = $variables['attributes'];
+  
   if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
 
     $attributes['data-src'] = file_create_url($variables['path']);
@@ -127,6 +128,8 @@ function lazyloader_image($variables) {
     $image_placeholder = !empty($settings['placeholder']) ? base_path() . trim($settings['placeholder']): LAZYLOADER_PATH . '/image_placeholder.gif';
 
     $attributes['src'] = $image_placeholder;
+    
+    $noscript_attributes['src'] = file_create_url($variables['path']);
   }
   else {
     $attributes['src'] = file_create_url($variables['path']);
@@ -134,9 +137,12 @@ function lazyloader_image($variables) {
 
   foreach (array('width', 'height', 'alt', 'title') as $key) {
     if (isset($variables[$key])) $attributes[$key] = $variables[$key];
+    if (isset($variables[$key])) $noscript_attributes[$key] = $variables[$key];
   }
 
-  return '<img' . drupal_attributes($attributes) . ' />';
+  $noscript = '<noscript><img' . drupal_attributes($noscript_attributes) . ' /></noscript>';
+  
+  return '<img' . drupal_attributes($attributes) . ' />' . $noscript;
 }
 
 
@@ -157,6 +163,7 @@ function lazyloader_process_html(&$vars) {
     $icon = ($settings['loader_icon'] != 0) ? LAZYLOADER_PATH . '/loader/loader-' . $settings['loader_icon'] . '.gif': '';
 
     $lazyloader_init = '
+      <noscript><style type="text/css" media="all">img[data-src] { display: none; }</style></noscript>
       <script type="text/javascript">
         jQuery(function($){
           $("img[data-src]").lazyloader({distance: ' . trim($settings['distance']) . ', icon: "' . $icon . '" });
