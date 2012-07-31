@@ -39,7 +39,7 @@
   // Defaults
   $.fn.lazyloader.defaults = {
     distance: 0, // the distance (in pixels) of image when loading of the actual image will happen
-    icon: ''     // display animating icon
+    icon: '',    // display animating icon
   };
 
 
