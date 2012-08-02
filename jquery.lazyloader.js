@@ -47,8 +47,8 @@
   function loadActualImages(images, settings){
     images.each(function(){
       var imageHeight = $(this).height(), imageWidth = $(this).width();
-      var iconTop = Math.round(imageHeight/2), iconLeft = Math.round(imageWidth/2), iconFactor = Math.round($(this).siblings('.lazyloader-icon').height()/2);
-      $(this).siblings('.lazyloader-icon').css({ top: iconTop - iconFactor, left: iconLeft - iconFactor });
+      var iconTop = Math.round(imageHeight/2), iconLeft = Math.round(imageWidth/2), iconFactor = Math.round($(this).siblings('img.lazyloader-icon').height()/2);
+      $(this).siblings('img.lazyloader-icon').css({ top: iconTop - iconFactor, left: iconLeft - iconFactor });
 
       if (windowView(this, settings) && ($(this).attr('data-src'))){
         loadImage(this);
