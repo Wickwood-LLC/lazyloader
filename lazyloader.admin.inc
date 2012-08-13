@@ -76,8 +76,8 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
     '#suffix'        => '</div></div>',
   );
 
-  $form['save']      = array( '#type' => 'submit', '#value' => t('Save'), );
-  $form['reset']     = array( '#type' => 'submit', '#value' => t('Reset'), );
+  $form['save']      = array( '#type' => 'submit', '#value' => 'Save', );
+  $form['reset']     = array( '#type' => 'submit', '#value' => 'Reset', );
 
   //dsm($form);
   return $form;
@@ -93,7 +93,7 @@ function lazyloader_admin_submit($form, $form_state) {
   global $_lazyloader_defaults;
 
   $form_values = $form_state['values'];
-
+  //dsm($form_values);
   if ($form_values['op'] == 'Save') {
     $settings = $form_values['lazyloader']; // save user settings
   }
