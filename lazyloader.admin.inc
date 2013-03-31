@@ -13,9 +13,7 @@
  */
 function lazyloader_admin($form, &$form_state, $op = NULL) {
 
-  global $_lazyloader_set;
-
-  $settings = $_lazyloader_set;
+  $settings = lazyloader_get_settings();
 
   $form = array();
 
@@ -76,10 +74,9 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
     '#suffix'        => '</div></div>',
   );
 
-  $form['save']      = array( '#type' => 'submit', '#value' => 'Save', );
-  $form['reset']     = array( '#type' => 'submit', '#value' => 'Reset', );
+  $form['save']      = array( '#type' => 'submit', '#value' => t('Save'), );
+  $form['reset']     = array( '#type' => 'submit', '#value' => t('Reset'), );
 
-  //dsm($form);
   return $form;
 }
 
@@ -89,16 +86,15 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
  *
  */
 function lazyloader_admin_submit($form, $form_state) {
-
-  global $_lazyloader_defaults;
+  $settings = lazyloader_get_settings();
 
   $form_values = $form_state['values'];
-  //dsm($form_values);
+
   if ($form_values['op'] == 'Save') {
     $settings = $form_values['lazyloader']; // save user settings
   }
   elseif ($form_values['op'] == 'Reset') {
-    $settings = $_lazyloader_defaults;      // save default settings
+    $settings = lazyloader_get_settings(TRUE);      // save default settings
   }
 
   variable_set('lazyloader', $settings);
