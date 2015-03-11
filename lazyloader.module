@@ -147,7 +147,10 @@ function lazyloader_image($variables) {
     if (isset($variables[$key])) $noscript_attributes[$key] = $variables[$key];
   }
 
-  $noscript = '<noscript><img' . drupal_attributes($noscript_attributes) . ' /></noscript>';
+  $noscript = '';
+  if (!empty($attributes['data-src'])) {
+    $noscript = '<noscript><img' . drupal_attributes($noscript_attributes) . ' /></noscript>';
+  }
 
   return '<img' . drupal_attributes($attributes) . ' />' . $noscript;
 }
