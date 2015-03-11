@@ -45,16 +45,20 @@
 
   // Loading actual images
   function loadActualImages(images, settings){
-    images.each(function(){
-      var imageHeight = $(this).height(), imageWidth = $(this).width();
-      var iconTop = Math.round(imageHeight/2), iconLeft = Math.round(imageWidth/2), iconFactor = Math.round($(this).siblings('img.lazyloader-icon').height()/2);
-      $(this).siblings('img.lazyloader-icon').css({ top: iconTop - iconFactor, left: iconLeft - iconFactor });
+    clearTimeout($.fn.lazyloader.timeout);
 
-      if (windowView(this, settings) && ($(this).attr('data-src'))){
-        loadImage(this);
-        $(this).fadeIn('slow');
-      }
-    });
+    $.fn.lazyloader.timeout = setTimeout(function(){
+      images.each(function(){
+        var imageHeight = $(this).height(), imageWidth = $(this).width();
+        var iconTop = Math.round(imageHeight/2), iconLeft = Math.round(imageWidth/2), iconFactor = Math.round($(this).siblings('img.lazyloader-icon').height()/2);
+        $(this).siblings('img.lazyloader-icon').css({ top: iconTop - iconFactor, left: iconLeft - iconFactor });
+
+        if (windowView(this, settings) && ($(this).attr('data-src'))){
+          loadImage(this);
+          $(this).fadeIn('slow');
+        }
+      });
+    }, 50);
   };
 
 
@@ -79,7 +83,7 @@
         imageLeft    = $(image).offset().left - settings['distance'],
         imageRight   = imageLeft + imageWidth + settings['distance'];
 
-           // This will return true if any corner of the image is within the screen 
+           // This will return true if any corner of the image is within the screen
     return (((windowBottom >= imageTop) && (windowTop <= imageTop)) || ((windowBottom >= imageBottom) && (windowTop <= imageBottom))) &&
            (((windowRight >= imageLeft) && (windowLeft <= imageLeft)) || ((windowRight >= imageRight) && (windowLeft <= imageRight)));
   };
