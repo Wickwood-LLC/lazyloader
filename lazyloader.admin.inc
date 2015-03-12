@@ -89,10 +89,10 @@ function lazyloader_admin_submit($form, $form_state) {
 
   $form_values = $form_state['values'];
 
-  if ($form_values['op'] == 'Save') {
+  if ($form_values['op'] == t('Save')) {
     $settings = $form_values['lazyloader']; // save user settings
   }
-  elseif ($form_values['op'] == 'Reset') {
+  elseif ($form_values['op'] == t('Reset')) {
     $settings = lazyloader_get_settings(TRUE);      // save default settings
   }
 
