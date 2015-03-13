@@ -126,30 +126,26 @@ function lazyloader_image($variables) {
   $attributes = $variables['attributes'];
   $noscript_attributes = $variables['attributes'];
 
-  if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude']) && empty($variables['lazyloader_exclude'])) {
+  if (_lazy_loader_enabled() && empty($variables['lazyloader_exclude'])) {
 
     $attributes['data-src'] = file_create_url($variables['path']);
 
-    // path to dummy placeholder image, to be replaced by actual image
+    // Path to dummy placeholder image, to be replaced by actual image.
     $image_placeholder = !empty($settings['placeholder']) ? base_path() . trim($settings['placeholder']) : url(drupal_get_path('module', 'lazyloader') . '/image_placeholder.gif');
-
     $attributes['src'] = $image_placeholder;
-
     $noscript_attributes['src'] = file_create_url($variables['path']);
+
+    // Integrate with Responsive Webdesign module.
+    if (module_exists('rdwimages')) {
+      global $_rwdimages_set;
+      if ($_rwdimages_set['enabled']) {
+        $attributes['class'] = array('rwdimage');
+      }
+    }
+
   }
   else {
     $attributes['src'] = file_create_url($variables['path']);
-  }
-
-  // responsive web design module
-  if (module_exists('rwdimages')) {
-    global $_rwdimages_set;
-
-    $rwdimages_settings = $_rwdimages_set;
-
-    if ($rwdimages_settings['enabled'] && !drupal_match_path($_GET['q'], $rwdimages_settings['exclude'])) {
-      $attributes['class'] = array('rwdimage');
-    }
   }
 
   foreach (array('width', 'height', 'alt', 'title') as $key) {
@@ -177,7 +173,7 @@ function lazyloader_image($variables) {
 function lazyloader_page_build(&$vars) {
   $settings = lazyloader_get_settings();
 
-  if ($settings['enabled'] && !drupal_match_path($_GET['q'], $settings['exclude'])) {
+  if (_lazy_loader_enabled()) {
     // add noscript markup as a fallback
     $noscript = '<noscript><style type="text/css" media="all">img[data-src] { display: none; }</style></noscript>';
     $vars['page_bottom']['lazyload']['#markup'] = $noscript;
@@ -198,4 +194,31 @@ function lazyloader_page_build(&$vars) {
       'scope' => 'footer',
     );
   }
+}
+
+/**
+ * Helper function to determine whether the lazyloader is enabled in a page.
+ *
+ * @return bool
+ */
+function _lazy_loader_enabled() {
+  $settings = lazyloader_get_settings();
+  // Bail if lazyloader is disabled entirely.
+  if (!$settings['enabled']) {
+    return FALSE;
+  }
+
+  // Convert path to lowercase. This allows comparison of the same path
+  // with different case. Ex: /Page, /page, /PAGE.
+  $pages = drupal_strtolower($settings['exclude']);
+  // Convert the Drupal path to lowercase
+  $path = drupal_strtolower(drupal_get_path_alias($_GET['q']));
+
+  // Compare the lowercase internal and lowercase path alias (if any).
+  $path_match = drupal_match_path($path, $pages);
+  if ($path != $_GET['q']) {
+    $path_match = $path_match || drupal_match_path($_GET['q'], $pages);
+  }
+
+  return !$path_match;
 }
