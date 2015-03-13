@@ -11,42 +11,30 @@
  * Admin Form: UI
  *
  */
-function lazyloader_admin($form, &$form_state, $op = NULL) {
-
-  $settings = lazyloader_get_settings();
-
+function lazyloader_admin() {
   $form = array();
 
-  $form['lazyloader'] = array(
-    '#type' => 'fieldset',
-    '#title' => 'Lazyloader Configuration',
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-    '#tree' => TRUE,
-    '#description' => t(''),
-  );
-
-  $form['lazyloader']['enabled'] = array(
+  $form['lazyloader_enabled'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enabled'),
-    '#default_value' => $settings['enabled'],
+    '#default_value' => variable_get('lazyloader_enabled', LAZYLOADER_ENABLED),
     '#description' => t('Enable/Disable Lazyloader (Useful for testing)'),
     '#prefix' => '<div class="lazy-columns clearfix"><div class="lazy-column lazy-column-1">',
   );
 
-  $form['lazyloader']['distance'] = array(
+  $form['lazyloader_distance'] = array(
     '#type' => 'textfield',
     '#title' => t('Distance'),
-    '#default_value' => $settings['distance'],
+    '#default_value' => variable_get('lazyloader_distance', LAZYLOADER_DISTANCE),
     '#size' => 5,
     '#maxlength' => 5,
     '#description' => t('The distance (in pixels) of image to the viewable browser window before it loads the actual image.'),
   );
 
-  $form['lazyloader']['placeholder'] = array(
+  $form['lazyloader_placeholder'] = array(
     '#type' => 'textfield',
     '#title' => t('Placeholder Image'),
-    '#default_value' => $settings['placeholder'],
+    '#default_value' => variable_get('lazyloader_placeholder', LAZYLOADER_PLACEHOLDER),
     '#description' => t('Path to your placeholder image, ex. sites/default/files/placeholder_image.gif. Leave it blank to use the default image.'),
   );
 
@@ -56,50 +44,58 @@ function lazyloader_admin($form, &$form_state, $op = NULL) {
     $loader[$i] = '<img alt="Lazyloader Icon" src="' . $loader_dir . 'loader-' . $i . '.gif" />';
   }
 
-  $form['lazyloader']['loader_icon'] = array(
+  $form['lazyloader_icon'] = array(
     '#type' => 'radios',
     '#title' => t('Loader Icon'),
     '#options' => $loader,
-    '#default_value' => $settings['loader_icon'],
+    '#default_value' => variable_get('lazyloader_icon', LAZYLOADER_ICON),
     '#description' => t('This icon will show when the actual image is not yet fully loaded.'),
     '#suffix' => '</div>',
   );
 
-  $form['lazyloader']['exclude'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Excluded Pages'),
-    '#default_value' => $settings['exclude'],
-    '#description' => t('List the page paths to be excluded from lazyloading on each line. This is useful when you want to redirect your user with disabled javascript browser on pages with the same content but not using image lazyloading. Ex. node/1'),
+  $form['lazyloader_exclude_option'] = array(
+    '#type'          => 'radios',
+    '#title'         => t('Enable on specific pages'),
+    '#default_value' => variable_get('lazyloader_exclude_option', LAZYLOADER_EXCLUDE_OPTION),
+    '#options'       => array(
+      'exclude' => t('All pages except those listed'),
+      'include' => t('Only the listed pages'),
+    ),
     '#prefix' => '<div class="lazy-column lazy-column-2">',
+  );
+
+  $form['lazyloader_paths'] = array(
+    '#type' => 'textarea',
+    '#title_display' => 'invisible',
+    '#title' => t('Pages'),
+    '#default_value' => variable_get('lazyloader_paths', LAZYLOADER_PATHS),
+    '#description'   => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are blog for the blog page and blog/* for every personal blog. <front> is the front page."),
     '#suffix' => '</div></div>',
   );
 
-  $form['save'] = array('#type' => 'submit', '#value' => t('Save'),);
-  $form['reset'] = array('#type' => 'submit', '#value' => t('Reset'),);
+  $form['actions']['reset'] = array('#type' => 'submit', '#value' => t('Reset'), '#weight' => 10);
+  $form['#submit'][] = 'lazyloader_admin_submit';
 
-  return $form;
+  return system_settings_form($form);
 }
 
 
 /**
- * Admin Form: Submit
+ * Submit handler for the lazyloader settings form.
  */
-function lazyloader_admin_submit($form, $form_state) {
-  $settings = lazyloader_get_settings();
-
-  $form_values = $form_state['values'];
-
-  if ($form_values['op'] == t('Save')) {
-    $settings = $form_values['lazyloader']; // save user settings
-  }
-  elseif ($form_values['op'] == t('Reset')) {
-    $settings = lazyloader_get_settings(TRUE);      // save default settings
+function lazyloader_admin_submit($form, &$form_state) {
+  if ($form_state['values']['op'] == t('Reset')) {
+    // Reset form values.
+    $form_state['values']['lazyloader_enable'] = LAZYLOADER_ENABLED;
+    $form_state['values']['lazyloader_distance'] = LAZYLOADER_DISTANCE;
+    $form_state['values']['lazyloader_icon'] = LAZYLOADER_ICON;
+    $form_state['values']['lazyloader_placeholder'] = LAZYLOADER_PLACEHOLDER;
+    $form_state['values']['lazyloader_paths'] = LAZYLOADER_PATHS;
+    $form_state['values']['lazyloader_exclude_option'] = LAZYLOADER_EXCLUDE_OPTION;
   }
 
   // Rebuild the theme registry if the module was enabled/disabled.
-  if ($form['lazyloader']['enabled']['#default_value'] !== $settings['enabled']) {
+  if ($form['lazyloader_enabled']['#default_value'] !== $form_state['values']['lazyloader_enabled']) {
     drupal_theme_rebuild();
   }
-
-  variable_set('lazyloader', $settings);
 }
