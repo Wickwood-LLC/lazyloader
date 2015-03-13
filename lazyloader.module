@@ -13,7 +13,7 @@ define("LAZYLOADER_ENABLED", TRUE);
 define("LAZYLOADER_DISTANCE", 0);
 define("LAZYLOADER_ICON", 7);
 define("LAZYLOADER_PLACEHOLDER", '');
-define("LAZYLOADER_PATHS", '');
+define("LAZYLOADER_PATHS", "media/*/format-form\nadmin/*\nnode/add/*\nnode/*/edit");
 define("LAZYLOADER_EXCLUDE_OPTION", 'exclude');
 
 /**
