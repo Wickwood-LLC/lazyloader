@@ -91,28 +91,34 @@ function lazyloader_theme_registry_alter(&$theme_registry) {
  *  HTML for a lazyloaded image
  */
 function lazyloader_image($variables) {
+  static $rdwimages_enabled, $image_placeholder_src;
   $attributes = $variables['attributes'];
   $noscript_attributes = $variables['attributes'];
 
+  $src = file_create_url($variables['path']);
   if (_lazy_loader_enabled()) {
 
-    $attributes['data-src'] = file_create_url($variables['path']);
-    // Path to dummy placeholder image, to be replaced by actual image.
-    $image_placeholder = trim(variable_get('lazyloader_placeholder', LAZYLOADER_PLACEHOLDER));
-    $attributes['src'] = $image_placeholder ? base_path() . $image_placeholder : url(drupal_get_path('module', 'lazyloader') . '/image_placeholder.gif');
-    $noscript_attributes['src'] = file_create_url($variables['path']);
+    $attributes['data-src'] = $src;
+    if (!isset($image_placeholder_src)) {
+      // Path to dummy placeholder image, to be replaced by actual image.
+      $image_placeholder = trim(variable_get('lazyloader_placeholder', LAZYLOADER_PLACEHOLDER));
+      $image_placeholder_src = $image_placeholder ? base_path() . $image_placeholder : file_create_url(drupal_get_path('module', 'lazyloader') . '/image_placeholder.gif');
+    }
+    $attributes['src'] = $image_placeholder_src;
+    $noscript_attributes['src'] = $src;
 
     // Integrate with Responsive Webdesign module.
-    if (module_exists('rdwimages')) {
+    if (!isset($rdwimages_enabled)) {
       global $_rwdimages_set;
-      if ($_rwdimages_set['enabled']) {
-        $attributes['class'] = array('rwdimage');
-      }
+      $rdwimages_enabled = module_exists('rdwimages') && $_rwdimages_set['enabled'];
+    }
+    if ($rdwimages_enabled) {
+      $attributes['class'] = array('rwdimage');
     }
 
   }
   else {
-    $attributes['src'] = file_create_url($variables['path']);
+    $attributes['src'] = $src;
   }
 
   foreach (array('width', 'height', 'alt', 'title') as $key) {
