@@ -173,9 +173,15 @@ Script;
  * @return bool
  */
 function _lazy_loader_enabled() {
+  static $enabled;
+
+  if(isset($enabled)){
+    return $enabled;
+  }
   // Bail if lazyloader is disabled entirely.
   if (!variable_get('lazyloader_enabled', LAZYLOADER_ENABLED)) {
-    return FALSE;
+    $enabled = FALSE;
+    return $enabled;
   }
 
   // Convert path to lowercase. This allows comparison of the same path
@@ -191,11 +197,13 @@ function _lazy_loader_enabled() {
   }
 
   if (variable_get('lazyloader_exclude_option', LAZYLOADER_EXCLUDE_OPTION) === 'exclude') {
-    return !$path_match;
+    $enabled = !$path_match;
   }
   else {
-    return $path_match;
+    $enabled = $path_match;
   }
+
+  return $enabled;
 }
 
 /**
