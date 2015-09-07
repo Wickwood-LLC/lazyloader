@@ -15,6 +15,7 @@ define("LAZYLOADER_ICON", 7);
 define("LAZYLOADER_PLACEHOLDER", '');
 define("LAZYLOADER_PATHS", "media/*/format-form\nadmin/*\nnode/add/*\nnode/*/edit");
 define("LAZYLOADER_EXCLUDE_OPTION", 'exclude');
+define("LAZYLOADER_LOAD_IMAGE_DELAY", 50);
 
 /**
  * Implements hook_menu().
@@ -163,6 +164,17 @@ Script;
       'data' => $lazyloader_init,
       'type' => 'inline',
       'scope' => 'footer',
+    );
+
+    $settings = array(
+      'lazyloader' => array(
+        'loadImageDelay' => variable_get('lazyloader_load_image_delay', LAZYLOADER_LOAD_IMAGE_DELAY)
+      ),
+    );
+
+    $vars['page_bottom']['lazyload']['#attached']['js'][] = array(
+      'data' => $settings,
+      'type' => 'setting',
     );
   }
 }

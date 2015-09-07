@@ -31,6 +31,15 @@ function lazyloader_admin() {
     '#description' => t('The distance (in pixels) of image to the viewable browser window before it loads the actual image.'),
   );
 
+  $form['lazyloader_load_image_delay'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Load Image Delay'),
+    '#default_value' => variable_get('lazyloader_load_image_delay', LAZYLOADER_LOAD_IMAGE_DELAY),
+    '#size' => 5,
+    '#maxlength' => 5,
+    '#description' => t('The delay (in milliseconds) for the scroll event before it loads the actual image.'),
+  );
+
   $form['lazyloader_placeholder'] = array(
     '#type' => 'textfield',
     '#title' => t('Placeholder Image'),

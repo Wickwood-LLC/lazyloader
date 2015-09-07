@@ -66,8 +66,8 @@
           $image.fadeIn('slow');
         }
       });
-    }, 50);
-  };
+    }, Drupal.settings.lazyloader.loadImageDelay);
+  }
 
 
   // Check if the images are within the window view (top, bottom, left and right)
@@ -94,7 +94,7 @@
            // This will return true if any corner of the image is within the screen
     return (((windowBottom >= imageTop) && (windowTop <= imageTop)) || ((windowBottom >= imageBottom) && (windowTop <= imageBottom))) &&
            (((windowRight >= imageLeft) && (windowLeft <= imageLeft)) || ((windowRight >= imageRight) && (windowLeft <= imageRight)));
-  };
+  }
 
 
   // Load the image
@@ -104,6 +104,6 @@
     $image.load(function() {
       $image.siblings('img.lazyloader-icon').remove();
     });
-  };
+  }
 
 })(jQuery);

@@ -27,6 +27,7 @@ function lazyloader_uninstall() {
     'lazyloader_icon',
     'lazyloader_paths',
     'lazyloader_exclude_option',
+    'lazyloader_load_image_delay',
   );
 
   foreach ($variables as $variable) {
@@ -37,7 +38,7 @@ function lazyloader_uninstall() {
 /**
  * Migrate settings.
  */
-function lazyloader_update_7001(){
+function lazyloader_update_7001() {
   $settings = variable_get('lazyloader', array());
 
   if  (isset($settings['enabled'])) {
