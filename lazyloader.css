@@ -6,10 +6,6 @@
  *
  */
 
-/* Lazyloader Render */ 
-img[data-src] {}
-.lazyloader-icon { position: absolute; z-index: 200; }
-
 /* Lazyloader Admin UI */
 .lazy-columns {}
 .lazy-column { width: 49%;}

@@ -28,6 +28,9 @@ function lazyloader_uninstall() {
     'lazyloader_paths',
     'lazyloader_exclude_option',
     'lazyloader_load_image_delay',
+    'lazyloader_debounce',
+    'lazyloader_unload',
+    'lazyloader_debugging',
   );
 
   foreach ($variables as $variable) {

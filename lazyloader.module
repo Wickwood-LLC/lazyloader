@@ -10,19 +10,21 @@
  */
 
 define("LAZYLOADER_ENABLED", TRUE);
-define("LAZYLOADER_DISTANCE", 0);
+define("LAZYLOADER_DISTANCE", 250);
 define("LAZYLOADER_ICON", 7);
 define("LAZYLOADER_PLACEHOLDER", '');
 define("LAZYLOADER_PATHS", "media/*/format-form\nadmin/*\nnode/add/*\nnode/*/edit");
 define("LAZYLOADER_EXCLUDE_OPTION", 'exclude');
 define("LAZYLOADER_LOAD_IMAGE_DELAY", 50);
+define("LAZYLOADER_DEBOUNCE", TRUE);
+define("LAZYLOADER_UNLOAD", FALSE);
+define("LAZYLOADER_DEBUGGING", FALSE);
 
 /**
  * Implements hook_menu().
  *
  */
 function lazyloader_menu() {
-
   $items = array();
 
   $items['admin/config/media/lazyloader'] = array(
@@ -44,7 +46,6 @@ function lazyloader_menu() {
  *
  */
 function lazyloader_permission() {
-
   return array(
     'administer lazyloader' => array(
       'title' => t('Administer Lazyloader'),
@@ -102,17 +103,12 @@ function lazyloader_image($variables) {
   $attributes = $variables['attributes'];
 
   // Set the data source and placeholder image.
-  $attributes['data-src'] = file_create_url($variables['path']);
+  $attributes['data-echo'] = file_create_url($variables['path']);
+  $attributes['data-icon'] = _lazyloader_icon_path();
   if (!isset($image_placeholder_src)) {
     // Path to dummy placeholder image, to be replaced by actual image.
     $image_placeholder = trim(variable_get('lazyloader_placeholder', LAZYLOADER_PLACEHOLDER));
     $image_placeholder_src = $image_placeholder ? base_path() . $image_placeholder : file_create_url(drupal_get_path('module', 'lazyloader') . '/image_placeholder.gif');
-  }
-
-  foreach (array('width', 'height', 'alt', 'title') as $key) {
-    if (isset($variables[$key])) {
-      $attributes[$key] = $variables[$key];
-    }
   }
 
   // Integrate with Responsive Webdesign module.
@@ -121,7 +117,7 @@ function lazyloader_image($variables) {
     $rdwimages_enabled = module_exists('rdwimages') && $_rwdimages_set['enabled'];
   }
   if ($rdwimages_enabled) {
-    $attributes['class'] = array('rwdimage');
+    $attributes['class'] = isset($attributes['class']) ? $attributes['class'] + array('rwdimage') : array('rdwimage');
   }
 
   // Add noscript as a fallback.
@@ -131,55 +127,33 @@ function lazyloader_image($variables) {
     'path' =>   $image_placeholder_src,
     'attributes' => $attributes,
   );
-  return theme_image($arguments) . $noscript;
-}
 
-/**
- * Implements hook_page_build().
- *
- * Initialize the trigger for lazyloader.
- */
-function lazyloader_page_build(&$vars) {
-  if (_lazy_loader_enabled()) {
-    // add noscript markup as a fallback
-    $vars['page_bottom']['lazyload']['#markup'] = <<<'NOSCRIPT'
-      <noscript>
-        <style type="text/css" media="all">
-          img[data-src] { display: none !important; }
-        </style>
-      </noscript>
-NOSCRIPT;
-
-    // inline load this js with ajax / page compatibility in mind
-    $distance = trim(variable_get('lazyloader_distance', LAZYLOADER_DISTANCE));
-    $icon = _lazyloader_icon_path();
-    $lazyloader_init = <<<Script
-      (function ($) {
-        Drupal.behaviors.lazyloader = {
-          attach: function (context, settings) {
-            $("img[data-src]").lazyloader({distance: {$distance}, icon: "{$icon}" });
-          }
-        };
-      }(jQuery));
-Script;
-
-    $vars['page_bottom']['lazyload']['#attached']['js'][] = array(
-      'data' => $lazyloader_init,
-      'type' => 'inline',
-      'scope' => 'footer',
-    );
-
-    $settings = array(
-      'lazyloader' => array(
-        'loadImageDelay' => variable_get('lazyloader_load_image_delay', LAZYLOADER_LOAD_IMAGE_DELAY)
-      ),
-    );
-
-    $vars['page_bottom']['lazyload']['#attached']['js'][] = array(
-      'data' => $settings,
-      'type' => 'setting',
-    );
+  foreach (array('width', 'height', 'alt', 'title') as $key) {
+    if (isset($variables[$key])) {
+      $arguments[$key] = $variables[$key];
+    }
   }
+
+  // Get the icon width and height for use in the javascript.
+  list($icon_width, $icon_height) = getimagesize(substr(_lazyloader_icon_path(), 1));
+
+  $settings['lazyloader'] = array(
+    'throttle' => variable_get('lazyloader_load_image_delay', LAZYLOADER_LOAD_IMAGE_DELAY),
+    'offset' => variable_get('lazyloader_distance', LAZYLOADER_DISTANCE),
+    'debounce' => variable_get('lazyloader_debounce', LAZYLOADER_DEBOUNCE),
+    'unload' => variable_get('lazyloader_unload', LAZYLOADER_UNLOAD),
+    'icon' => _lazyloader_icon_path(),
+    'offsetX' => $icon_width > 0 ? floor($icon_width / 2) : 0,
+    'offsetY' => $icon_height > 0 ? floor($icon_height / 2) : 0,
+  );
+  drupal_add_js($settings, array('type' => 'setting'));
+
+  // Load the Echo library.
+  $variant = variable_get('lazyloader_debugging', LAZYLOADER_DEBUGGING) ? NULL : 'minified';
+  libraries_load_files(libraries_load('echo', $variant));
+
+  // Render the image.
+  return theme_image($arguments) . $noscript;
 }
 
 /**
@@ -234,4 +208,33 @@ function _lazyloader_icon_path() {
   }
 
   return '';
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function lazyloader_libraries_info() {
+  $libraries ['echo'] = array(
+    'name' => 'Echo',
+    'vendor url' => 'http://toddmotto.com/labs/echo/',
+    'download url' => 'https://github.com/toddmotto/echo/archive/master.zip',
+    'path' => 'dist',
+    'files' => array(
+      'js' => array('echo.js'),
+    ),
+    'integration files' => array(
+      'lazyloader' => array(
+        'js' => array('lazyloader.js'),
+      ),
+    ),
+    'variants' => array(
+      'minified' => array(
+        'files' => array(
+          'js' => array('echo.min.js'),
+        ),
+      ),
+    ),
+  );
+
+  return $libraries;
 }
