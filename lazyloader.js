@@ -40,12 +40,38 @@
           $(element).next('.lazyloader-icon').remove();
         }
       });
+
+      // Add a scroll eventlistener to every parent element with overflow:scroll; so we can trigger echo when the
+      // element is scrolled.
+      $('img[data-echo], [data-echo-background]').each(function() {
+        $(this).parents().each(function() {
+          if ($(this).css('overflow') == 'scroll') {
+            $(this).bind('scroll', function() {
+              lazyloaderDebounceOrThrottle(settings.lazyloader.debounce, settings.lazyloader.throttle)
+            });
+          }
+        });
+      });
     },
 
     detach: function (context, settings) {
       // Detach echo.
       echo.detach();
-    }
+    },
+
+    // Variable for throttling.
+    poll: null
   };
 
 })(jQuery);
+
+function lazyloaderDebounceOrThrottle(debounce, throttle) {
+  if(!debounce && !!Drupal.behaviors.lazyloader.poll) {
+    return;
+  }
+  clearTimeout(Drupal.behaviors.lazyloader.poll);
+  Drupal.behaviors.lazyloader.poll = setTimeout(function(){
+    echo.render();
+    Drupal.behaviors.lazyloader.poll = null;
+  }, throttle);
+}
