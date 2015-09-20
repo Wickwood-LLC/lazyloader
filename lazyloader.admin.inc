@@ -75,6 +75,7 @@ function lazyloader_admin() {
   for ($i = 1; $i <= 8; $i++) {
     $loader[$i] = '<img alt="Lazyloader Icon" src="' . $loader_dir . 'loader-' . $i . '.gif" />';
   }
+  $loader[9] = t('Custom icon');
 
   $form['lazyloader_icon'] = array(
     '#type' => 'radios',
@@ -82,6 +83,18 @@ function lazyloader_admin() {
     '#options' => $loader,
     '#default_value' => variable_get('lazyloader_icon', LAZYLOADER_ICON),
     '#description' => t('This icon will show when the actual image is not yet fully loaded.'),
+  );
+
+  $form['lazyloader_custom_icon_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Custom Loader Icon'),
+    '#default_value' => variable_get('lazyloader_custom_icon_path', LAZYLOADER_CUSTOM_ICON_PATH),
+    '#description' => t('Relative path to the custom loading icon you wish to use, ex. <em>profiles/MYPROFILE/custom_loader_icon.gif</em>.'),
+    '#states' => array(
+      'visible' => array(
+        ':input[name="lazyloader_icon"]' => array('value' => 9),
+        ),
+      ),
   );
 
   $form['lazyloader_exclude_option'] = array(
@@ -113,7 +126,6 @@ function lazyloader_admin() {
   return system_settings_form($form);
 }
 
-
 /**
  * Submit handler for the lazyloader settings form.
  */
@@ -123,6 +135,7 @@ function lazyloader_admin_submit($form, &$form_state) {
     $form_state['values']['lazyloader_enable'] = LAZYLOADER_ENABLED;
     $form_state['values']['lazyloader_distance'] = LAZYLOADER_DISTANCE;
     $form_state['values']['lazyloader_icon'] = LAZYLOADER_ICON;
+    $form_state['values']['lazyloader_custom_icon_path'] = LAZYLOADER_CUSTOM_ICON_PATH;
     $form_state['values']['lazyloader_placeholder'] = LAZYLOADER_PLACEHOLDER;
     $form_state['values']['lazyloader_paths'] = LAZYLOADER_PATHS;
     $form_state['values']['lazyloader_exclude_option'] = LAZYLOADER_EXCLUDE_OPTION;

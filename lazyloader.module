@@ -12,6 +12,7 @@
 define("LAZYLOADER_ENABLED", TRUE);
 define("LAZYLOADER_DISTANCE", 250);
 define("LAZYLOADER_ICON", 7);
+define("LAZYLOADER_CUSTOM_ICON_PATH", '');
 define("LAZYLOADER_PLACEHOLDER", '');
 define("LAZYLOADER_PATHS", "media/*/format-form\nadmin/*\nnode/add/*\nnode/*/edit");
 define("LAZYLOADER_EXCLUDE_OPTION", 'exclude');
@@ -135,7 +136,7 @@ function lazyloader_image($variables) {
   }
 
   // Get the icon width and height for use in the javascript.
-  list($icon_width, $icon_height) = getimagesize(substr(_lazyloader_icon_path(), 1));
+  list($icon_width, $icon_height) = getimagesize(substr(_lazyloader_icon_path(), strlen(base_path())));
 
   $settings['lazyloader'] = array(
     'throttle' => variable_get('lazyloader_load_image_delay', LAZYLOADER_LOAD_IMAGE_DELAY),
@@ -200,11 +201,17 @@ function _lazy_loader_enabled() {
  */
 function _lazyloader_icon_path() {
   $icon = variable_get('lazyloader_icon', LAZYLOADER_ICON);
+  $custom_icon_path = variable_get('lazyloader_custom_icon_path', LAZYLOADER_CUSTOM_ICON_PATH);
 
   if (!empty($icon)) {
     $base = base_path();
-    $path = drupal_get_path('module', 'lazyloader');
-    return "{$base}{$path}/loader/loader-{$icon}.gif";
+    if ($icon == 9) {
+      return "{$base}{$custom_icon_path}";
+    }
+    else {
+      $path = drupal_get_path('module', 'lazyloader');
+      return "{$base}{$path}/loader/loader-{$icon}.gif";
+    }
   }
 
   return '';
