@@ -8,10 +8,10 @@
  */
 
 /**
- * Admin Form: UI
+ * Admin Form: General settings
  *
  */
-function lazyloader_admin() {
+function lazyloader_admin_configure() {
   $form = array();
 
   $form['lazyloader_enabled'] = array(
@@ -19,7 +19,6 @@ function lazyloader_admin() {
     '#title' => t('Enabled'),
     '#default_value' => variable_get('lazyloader_enabled', LAZYLOADER_ENABLED),
     '#description' => t('Enable/Disable Lazyloader (Useful for testing)'),
-    '#prefix' => '<div class="lazy-columns clearfix"><div class="lazy-column lazy-column-1">',
   );
 
   $form['lazyloader_debugging'] = array(
@@ -59,7 +58,6 @@ function lazyloader_admin() {
     '#title' => t('Unload'),
     '#default_value' => variable_get('lazyloader_unload', LAZYLOADER_UNLOAD),
     '#description' => 'Checking unload option will make Lazyloader unload the images when they are no longer within the viewport (including the offset area).',
-    '#suffix' => '</div>',
   );
 
   $form['lazyloader_placeholder'] = array(
@@ -67,7 +65,6 @@ function lazyloader_admin() {
     '#title' => t('Placeholder Image'),
     '#default_value' => variable_get('lazyloader_placeholder', LAZYLOADER_PLACEHOLDER),
     '#description' => t('Path to your placeholder image, ex. sites/default/files/placeholder_image.gif. Leave it blank to use the default image.'),
-    '#prefix' => '<div class="lazy-column lazy-column-2">',
   );
 
   $loader_dir = base_path() . drupal_get_path('module', 'lazyloader') . '/loader/';
@@ -93,9 +90,48 @@ function lazyloader_admin() {
     '#states' => array(
       'visible' => array(
         ':input[name="lazyloader_icon"]' => array('value' => 9),
-        ),
       ),
+    ),
   );
+
+  $form['actions']['reset'] = array(
+    '#type' => 'submit',
+    '#value' => t('Reset'),
+    '#weight' => 10
+  );
+  $form['#submit'][] = 'lazyloader_admin_configure_submit';
+
+  return system_settings_form($form);
+}
+
+/**
+ * Submit handler for the lazyloader settings form.
+ */
+function lazyloader_admin_configure_submit($form, &$form_state) {
+  if ($form_state['values']['op'] == t('Reset')) {
+    // Reset form values.
+    $form_state['values']['lazyloader_enable'] = LAZYLOADER_ENABLED;
+    $form_state['values']['lazyloader_distance'] = LAZYLOADER_DISTANCE;
+    $form_state['values']['lazyloader_icon'] = LAZYLOADER_ICON;
+    $form_state['values']['lazyloader_custom_icon_path'] = LAZYLOADER_CUSTOM_ICON_PATH;
+    $form_state['values']['lazyloader_placeholder'] = LAZYLOADER_PLACEHOLDER;
+    $form_state['values']['lazyloader_unload'] = LAZYLOADER_UNLOAD;
+    $form_state['values']['lazyloader_debounce'] = LAZYLOADER_DEBOUNCE;
+    $form_state['values']['lazyloader_development'] = LAZYLOADER_DEBUGGING;
+  }
+
+  // Rebuild the theme registry if the module was enabled/disabled.
+  if ($form['lazyloader_enabled']['#default_value'] !== $form_state['values']['lazyloader_enabled']) {
+    drupal_theme_rebuild();
+  }
+}
+
+/**
+ * Admin form: Exclude options.
+ *
+ */
+function lazyloader_admin_exclude() {
+  $form = array();
 
   $form['lazyloader_exclude_option'] = array(
     '#type' => 'radios',
@@ -113,7 +149,6 @@ function lazyloader_admin() {
     '#title' => t('Pages'),
     '#default_value' => variable_get('lazyloader_paths', LAZYLOADER_PATHS),
     '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are blog for the blog page and blog/* for every personal blog. <front> is the front page."),
-    '#suffix' => '</div></div>',
   );
 
   $form['actions']['reset'] = array(
@@ -121,7 +156,7 @@ function lazyloader_admin() {
     '#value' => t('Reset'),
     '#weight' => 10
   );
-  $form['#submit'][] = 'lazyloader_admin_submit';
+  $form['#submit'][] = 'lazyloader_admin_exclude_submit';
 
   return system_settings_form($form);
 }
@@ -129,23 +164,10 @@ function lazyloader_admin() {
 /**
  * Submit handler for the lazyloader settings form.
  */
-function lazyloader_admin_submit($form, &$form_state) {
+function lazyloader_admin_exclude_submit($form, &$form_state) {
   if ($form_state['values']['op'] == t('Reset')) {
     // Reset form values.
-    $form_state['values']['lazyloader_enable'] = LAZYLOADER_ENABLED;
-    $form_state['values']['lazyloader_distance'] = LAZYLOADER_DISTANCE;
-    $form_state['values']['lazyloader_icon'] = LAZYLOADER_ICON;
-    $form_state['values']['lazyloader_custom_icon_path'] = LAZYLOADER_CUSTOM_ICON_PATH;
-    $form_state['values']['lazyloader_placeholder'] = LAZYLOADER_PLACEHOLDER;
     $form_state['values']['lazyloader_paths'] = LAZYLOADER_PATHS;
     $form_state['values']['lazyloader_exclude_option'] = LAZYLOADER_EXCLUDE_OPTION;
-    $form_state['values']['lazyloader_unload'] = LAZYLOADER_UNLOAD;
-    $form_state['values']['lazyloader_debounce'] = LAZYLOADER_DEBOUNCE;
-    $form_state['values']['lazyloader_development'] = LAZYLOADER_DEBUGGING;
-  }
-
-  // Rebuild the theme registry if the module was enabled/disabled.
-  if ($form['lazyloader_enabled']['#default_value'] !== $form_state['values']['lazyloader_enabled']) {
-    drupal_theme_rebuild();
   }
 }

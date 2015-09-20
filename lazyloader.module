@@ -33,11 +33,29 @@ function lazyloader_menu() {
     'page callback' => 'drupal_get_form',
     'access callback' => 'user_access',
     'access arguments' => array('administer lazyloader'),
-    'page arguments' => array('lazyloader_admin', NULL),
+    'page arguments' => array('lazyloader_admin_configure', NULL),
     'type' => MENU_NORMAL_ITEM,
     'file' => 'lazyloader.admin.inc',
     'description' => 'Configure Lazyloader',
   );
+
+  $items['admin/config/media/lazyloader/configure'] = array(
+    'title' => 'Configure',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'description' => 'Configure Lazyloader settings',
+  );
+
+  $items['admin/config/media/lazyloader/exclude'] = array(
+    'title' => 'Exclude options',
+    'page callback' => 'drupal_get_form',
+    'access callback' => 'user_access',
+    'access arguments' => array('administer lazyloader'),
+    'page arguments' => array('lazyloader_admin_exclude', NULL),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'lazyloader.admin.inc',
+    'description' => 'Configure Lazyloader inclusion/exclusion settings',
+  );
+
   return $items;
 }
 
