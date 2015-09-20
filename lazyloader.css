@@ -3,19 +3,6 @@
  * Lazyloader admin CSS
  */
 
-/* Lazyloader Admin UI */
-.lazy-column {
-  width: 49%;
-}
-
-.lazy-column-1 {
-  float: left;
-}
-
-.lazy-column-2 {
-  float: right;
-}
-
 #edit-lazyloader-icon {
   display: -ms-flexbox;
   display: -webkit-flex;
@@ -35,8 +22,4 @@
   position: absolute;
   left: 0;
   top: 5px;
-}
-
-.description {
-  clear: both;
 }
