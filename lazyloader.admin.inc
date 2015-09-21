@@ -133,10 +133,10 @@ function lazyloader_admin_configure_submit($form, &$form_state) {
 function lazyloader_admin_exclude() {
   $form = array();
 
-  $form['lazyloader_exclude_option'] = array(
+  $form['lazyloader_page_exclude_option'] = array(
     '#type' => 'radios',
     '#title' => t('Enable on specific pages'),
-    '#default_value' => variable_get('lazyloader_exclude_option', LAZYLOADER_EXCLUDE_OPTION),
+    '#default_value' => variable_get('lazyloader_page_exclude_option', LAZYLOADER_PAGE_EXCLUDE_OPTION),
     '#options' => array(
       'exclude' => t('All pages except those listed'),
       'include' => t('Only the listed pages'),
@@ -148,7 +148,21 @@ function lazyloader_admin_exclude() {
     '#title_display' => 'invisible',
     '#title' => t('Pages'),
     '#default_value' => variable_get('lazyloader_paths', LAZYLOADER_PATHS),
-    '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. Example paths are blog for the blog page and blog/* for every personal blog. <front> is the front page."),
+    '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. i.e. <em>blog/*</em> or node/1"),
+  );
+
+  $options = array();
+  $types = node_type_get_types();
+  foreach ($types as $type) {
+    $options[$type->type] = $type->name;
+  }
+
+  $form['lazyloader_content_types'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#title' => t('Enabled on content types'),
+    '#default_value' => variable_get('lazyloader_content_types', array()),
+    '#description' => t('Enable Lazyloader on the selected content types only. If no content types are selected Lazyloader is enabled for all content types.'),
   );
 
   $form['actions']['reset'] = array(
@@ -168,6 +182,6 @@ function lazyloader_admin_exclude_submit($form, &$form_state) {
   if ($form_state['values']['op'] == t('Reset')) {
     // Reset form values.
     $form_state['values']['lazyloader_paths'] = LAZYLOADER_PATHS;
-    $form_state['values']['lazyloader_exclude_option'] = LAZYLOADER_EXCLUDE_OPTION;
+    $form_state['values']['lazyloader_page_exclude_option'] = LAZYLOADER_PAGE_EXCLUDE_OPTION;
   }
 }

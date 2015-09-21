@@ -15,7 +15,8 @@ define("LAZYLOADER_ICON", 7);
 define("LAZYLOADER_CUSTOM_ICON_PATH", '');
 define("LAZYLOADER_PLACEHOLDER", '');
 define("LAZYLOADER_PATHS", "media/*/format-form\nadmin/*\nnode/add/*\nnode/*/edit");
-define("LAZYLOADER_EXCLUDE_OPTION", 'exclude');
+define("LAZYLOADER_PAGE_EXCLUDE_OPTION", 'exclude');
+define("LAZYLOADER_CONTENT_TYPE_EXCLUDE_OPTION", 'exclude');
 define("LAZYLOADER_LOAD_IMAGE_DELAY", 50);
 define("LAZYLOADER_DEBOUNCE", TRUE);
 define("LAZYLOADER_UNLOAD", FALSE);
@@ -182,10 +183,10 @@ function lazyloader_image($variables) {
  */
 function _lazy_loader_enabled() {
   static $enabled;
-
   if(isset($enabled)){
     return $enabled;
   }
+
   // Bail if lazyloader is disabled entirely.
   if (!variable_get('lazyloader_enabled', LAZYLOADER_ENABLED)) {
     $enabled = FALSE;
@@ -204,11 +205,18 @@ function _lazy_loader_enabled() {
     $path_match = $path_match || drupal_match_path($_GET['q'], $pages);
   }
 
-  if (variable_get('lazyloader_exclude_option', LAZYLOADER_EXCLUDE_OPTION) === 'exclude') {
-    $enabled = !$path_match;
-  }
-  else {
-    $enabled = $path_match;
+  $path_exclude = variable_get('lazyloader_page_exclude_option', LAZYLOADER_PAGE_EXCLUDE_OPTION);
+  $enabled = $path_exclude === 'exclude' ? !$path_match : $path_match;
+
+  // Only check content types if Lazyloader is not disabled already.
+  if ($enabled && $node = menu_get_object()) {
+    $types = _lazyloader_enabled_types();
+
+    if (!empty($types)) {
+      $type = node_type_get_type($node);
+      $type_match = in_array($type->type, $types);
+      $enabled = $type_match;
+    }
   }
 
   return $enabled;
@@ -262,4 +270,16 @@ function lazyloader_libraries_info() {
   );
 
   return $libraries;
+}
+
+function _lazyloader_enabled_types(){
+  $types = variable_get('lazyloader_content_types', array());
+  // Filter out deselected types.
+  foreach ($types as $key => $type) {
+    if (!$type) {
+      unset($types[$key]);
+    }
+  }
+
+  return $types;
 }

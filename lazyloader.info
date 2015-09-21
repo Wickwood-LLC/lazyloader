@@ -10,5 +10,6 @@ dependencies[] = libraries
 files[] = lazyloader.install
 files[] = lazyloader.module
 files[] = lazyloader.admin.inc
+files[] = tests/lazyloader_exclude.test
 stylesheets[all][] = lazyloader.css
 configure = admin/config/media/lazyloader
