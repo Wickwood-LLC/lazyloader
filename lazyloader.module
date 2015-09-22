@@ -74,13 +74,26 @@ function lazyloader_permission() {
   );
 }
 
+/**
+ * Implements hook_theme().
+ */
+function lazyloader_theme($existing, $type, $theme, $path) {
+  $info = array();
+
+  $info['lazyloader_image'] = array(
+    'variables' => $existing['image']['variables'],
+    'function' => 'theme_lazyloader_image',
+  );
+
+  return $info;
+}
 
 /**
  * Implements hook_theme_registry_alter().
  */
 function lazyloader_theme_registry_alter(&$theme_registry) {
   if (variable_get('lazyloader_enabled', LAZYLOADER_ENABLED)) {
-    $theme_registry['image']['function'] = 'lazyloader_image';
+    $theme_registry['image']['function'] = 'theme_lazyloader_image';
   }
 
   return $theme_registry;
@@ -112,10 +125,10 @@ function lazyloader_theme_registry_alter(&$theme_registry) {
  * @return string
  *  HTML for a lazyloaded image
  */
-function lazyloader_image($variables) {
+function theme_lazyloader_image($variables) {
   $theme_image = theme_image($variables);
   // Use theme_image if lazyloader is not enabled.
-  if(!_lazy_loader_enabled()){
+  if($variables['theme_hook_original'] !== 'lazyloader_image' && !_lazy_loader_enabled()){
     return $theme_image;
   }
 
@@ -182,14 +195,14 @@ function lazyloader_image($variables) {
  * @return bool
  */
 function _lazy_loader_enabled() {
-  static $enabled;
-  if(isset($enabled)){
-    return $enabled;
-  }
-
   // Bail if lazyloader is disabled entirely.
   if (!variable_get('lazyloader_enabled', LAZYLOADER_ENABLED)) {
-    $enabled = FALSE;
+    return FALSE;
+  }
+
+  // This method gets called quite often, so let's cache all the heavy stuff.
+  static $enabled;
+  if(isset($enabled)){
     return $enabled;
   }
 

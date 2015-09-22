@@ -1,9 +1,10 @@
 <?php
 
 /**
- * Tests the select or other text field based functionality
+ * Tests Lazyloader's exclusion functionality.
  */
 class LazyloaderExcludeTestCase extends LazyloaderTestBase {
+
   public static function getInfo() {
     return array(
       'name' => 'Lazyloader exclude',

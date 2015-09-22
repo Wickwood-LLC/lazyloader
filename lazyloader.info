@@ -12,5 +12,6 @@ files[] = lazyloader.module
 files[] = lazyloader.admin.inc
 files[] = tests/lazyloader_test_base.test
 files[] = tests/lazyloader_exclude.test
+files[] = tests/lazyloader_theme.test
 stylesheets[all][] = lazyloader.css
 configure = admin/config/media/lazyloader
