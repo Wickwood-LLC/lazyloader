@@ -55,4 +55,28 @@ class LazyloaderExcludeTestCase extends LazyloaderTestBase {
     $this->drupalGet("node/{$this->node->nid}");
     $this->assertLazyloaderEnabled(FALSE, 'Lazyloader is also disabled on internal path if alias with wildcard matches ');
   }
+
+  /**
+   * Test functioning of the filename exclude setting.
+   */
+  function testFilenameExclude() {
+    $node = node_view($this->node);
+
+    variable_set('lazyloader_excluded_filenames', $node['field_images'][0]['#item']['filename']);
+
+    foreach (element_children($node['field_images']) as $image) {
+      $image = $node['field_images'][$image]['#item'];
+      $path = preg_quote(file_create_url($image['uri']), '/');
+      $pattern = '/data-echo="' . $path . '"/';
+
+      $this->drupalGet("node/{$this->node->nid}");
+      if ($image['filename'] !== variable_get('lazyloader_excluded_filenames')) {
+        $this->assertPattern("{$pattern}", 'Image is lazyloaded when not excluded by filename.');
+      }
+      else {
+        $this->assertNoPattern("{$pattern}", 'Image is NOT lazyloaded when excluded by filename.');
+      }
+    }
+  }
+
 }

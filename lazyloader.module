@@ -15,6 +15,7 @@ define("LAZYLOADER_ICON", 7);
 define("LAZYLOADER_CUSTOM_ICON_PATH", '');
 define("LAZYLOADER_PLACEHOLDER", '');
 define("LAZYLOADER_PATHS", "media/*/format-form\nadmin/*\nnode/add/*\nnode/*/edit");
+define("LAZYLOADER_EXCLUDED_FILENAMES", '');
 define("LAZYLOADER_PAGE_EXCLUDE_OPTION", 'exclude');
 define("LAZYLOADER_CONTENT_TYPE_EXCLUDE_OPTION", 'exclude');
 define("LAZYLOADER_LOAD_IMAGE_DELAY", 50);
@@ -99,7 +100,6 @@ function lazyloader_theme_registry_alter(&$theme_registry) {
   return $theme_registry;
 }
 
-
 /**
  * Returns HTML for an image.
  *
@@ -128,8 +128,10 @@ function lazyloader_theme_registry_alter(&$theme_registry) {
 function theme_lazyloader_image($variables) {
   $theme_image = theme_image($variables);
   // Use theme_image if lazyloader is not enabled.
-  if($variables['theme_hook_original'] !== 'lazyloader_image' && !_lazy_loader_enabled()){
-    return $theme_image;
+  if($variables['theme_hook_original'] !== 'lazyloader_image'){
+    if (!_lazy_loader_enabled() || _lazyloader_excluded_by_filename($variables)) {
+      return $theme_image;
+    }
   }
 
   static $rdwimages_enabled, $image_placeholder_src;
@@ -233,6 +235,17 @@ function _lazy_loader_enabled() {
   }
 
   return $enabled;
+}
+
+/**
+ * Helper function to determine if an image should be excluded by filename.
+ */
+function _lazyloader_excluded_by_filename($variables) {
+  $excluded_files = variable_get('lazyloader_excluded_filenames', LAZYLOADER_EXCLUDED_FILENAMES);
+  $parts = explode('/', $variables['path']);
+  $parts = explode('?', array_pop($parts));
+  $filename = array_shift($parts);
+  return (bool) preg_match('/^' . $filename . '$/m', $excluded_files);
 }
 
 /**

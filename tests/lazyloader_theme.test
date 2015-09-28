@@ -19,7 +19,7 @@ class LazyloaderThemeTestCase extends LazyloaderTestBase {
   function testThemeLazyloaderImage() {
     $node = node_view($this->node);
     $image = $node['field_images'][0]['#item'];
-    $path = str_replace('/', '\/', file_create_url($image['uri']));
+    $path = preg_quote(file_create_url($image['uri']), '/');
 
     foreach (array(TRUE, FALSE) as $module_enabled) {
       variable_set('lazyloader_enabled', $module_enabled);
