@@ -129,7 +129,9 @@ function theme_lazyloader_image($variables) {
   $theme_image = theme_image($variables);
   // Use theme_image if lazyloader is not enabled.
   if($variables['theme_hook_original'] !== 'lazyloader_image'){
-    if (!_lazy_loader_enabled() || _lazyloader_excluded_by_filename($variables)) {
+    if (!_lazy_loader_enabled() ||
+      _lazyloader_excluded_by_filename($variables) ||
+      _lazyloader_excluded_by_image_style($variables)) {
       return $theme_image;
     }
   }
@@ -225,7 +227,7 @@ function _lazy_loader_enabled() {
 
   // Only check content types if Lazyloader is not disabled already.
   if ($enabled && $node = menu_get_object()) {
-    $types = _lazyloader_enabled_types();
+    $types = _lazyloader_filter_selected_values(variable_get('lazyloader_content_types', array()));
 
     if (!empty($types)) {
       $type = node_type_get_type($node);
@@ -246,6 +248,28 @@ function _lazyloader_excluded_by_filename($variables) {
   $parts = explode('?', array_pop($parts));
   $filename = array_shift($parts);
   return (bool) preg_match('/^' . $filename . '$/m', $excluded_files);
+}
+
+/**
+ * Helper function to determine if an image should be excluded by image style.
+ */
+function _lazyloader_excluded_by_image_style($variables) {
+  $excluded_styles = _lazyloader_filter_selected_values(variable_get('lazyloader_image_styles', array()));
+  // If no image styles are selected we have nothing to exclude.
+  if (empty($excluded_styles)) {
+    return FALSE;
+  }
+
+  $styles = implode('|', array_keys(image_styles()));
+  // Make sure the image is actually a derived image.
+  if (preg_match('/styles\/[' . $styles . ']/', $variables['path'])) {
+    $excluded_styles = implode('|', $excluded_styles);
+    return !preg_match('/styles\/[' . $excluded_styles . ']/', $variables['path']);
+  }
+  else{
+    // Not a derived image, nothing to do here.
+    return FALSE;
+  }
 }
 
 /**
@@ -298,14 +322,16 @@ function lazyloader_libraries_info() {
   return $libraries;
 }
 
-function _lazyloader_enabled_types(){
-  $types = variable_get('lazyloader_content_types', array());
-  // Filter out deselected types.
-  foreach ($types as $key => $type) {
-    if (!$type) {
-      unset($types[$key]);
+/**
+ * Filters an array of selected checkbox values.
+ */
+function _lazyloader_filter_selected_values($values) {
+  // Filter out deselected values.
+  foreach ($values as $key => $value) {
+    if (!$value) {
+      unset($values[$key]);
     }
   }
 
-  return $types;
+  return $values;
 }

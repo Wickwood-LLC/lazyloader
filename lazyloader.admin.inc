@@ -151,13 +151,6 @@ function lazyloader_admin_exclude() {
     '#description' => t("Specify pages by using their paths. Enter one path per line. The '*' character is a wildcard. i.e. <em>blog/*</em> or node/1"),
   );
 
-  $form['lazyloader_excluded_filenames'] = array(
-    '#type' => 'textarea',
-    '#title' => t('Exclude images by filename'),
-    '#default_value' => variable_get('lazyloader_excluded_filenames', LAZYLOADER_EXCLUDED_FILENAMES),
-    '#description' => t('Any filenames entered in this field will be excluded from lazyloading. Enter one filename per line.'),
-  );
-
   $options = array();
   $types = node_type_get_types();
   foreach ($types as $type) {
@@ -170,6 +163,27 @@ function lazyloader_admin_exclude() {
     '#title' => t('Enabled on content types'),
     '#default_value' => variable_get('lazyloader_content_types', array()),
     '#description' => t('Enable Lazyloader on the selected content types only. If no content types are selected Lazyloader is enabled for all content types.'),
+  );
+
+  $options = array();
+  $styles = image_styles();
+  foreach ($styles as $style) {
+    $options[$style['name']] = $style['name'];
+  }
+
+  $form['lazyloader_image_styles'] = array(
+    '#type' => 'checkboxes',
+    '#options' => $options,
+    '#title' => t('Enabled for image styles'),
+    '#default_value' => variable_get('lazyloader_image_styles', array()),
+    '#description' => t('Enable Lazyloader for the selected image styles only. If no image styles are selected Lazyloader is enabled for all image styles.'),
+  );
+
+  $form['lazyloader_excluded_filenames'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Exclude images by filename'),
+    '#default_value' => variable_get('lazyloader_excluded_filenames', LAZYLOADER_EXCLUDED_FILENAMES),
+    '#description' => t('Any filenames entered in this field will be excluded from lazyloading. Enter one filename per line.'),
   );
 
   $form['actions']['reset'] = array(

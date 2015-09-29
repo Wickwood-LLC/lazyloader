@@ -31,6 +31,14 @@ abstract class LazyloaderTestBase extends DrupalWebTestCase {
       'field_name' => 'field_images',
       'entity_type' => 'node',
       'bundle' => 'page',
+      'display' => array(
+        'default' => array(
+          'type' => 'image',
+          'settings' => array(
+            'image_style' => 'medium',
+          ),
+        ),
+      ),
     );
     field_create_instance($instance_info);
 

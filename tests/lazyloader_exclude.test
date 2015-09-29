@@ -63,20 +63,45 @@ class LazyloaderExcludeTestCase extends LazyloaderTestBase {
     $node = node_view($this->node);
 
     variable_set('lazyloader_excluded_filenames', $node['field_images'][0]['#item']['filename']);
+    $this->drupalGet("node/{$this->node->nid}");
 
     foreach (element_children($node['field_images']) as $image) {
       $image = $node['field_images'][$image]['#item'];
-      $path = preg_quote(file_create_url($image['uri']), '/');
-      $pattern = '/data-echo="' . $path . '"/';
+      $pattern = '/data-echo=".*' . preg_quote($image['filename']) . '/';
 
-      $this->drupalGet("node/{$this->node->nid}");
       if ($image['filename'] !== variable_get('lazyloader_excluded_filenames')) {
+        $this->assertPattern("{$pattern}");
         $this->assertPattern("{$pattern}", 'Image is lazyloaded when not excluded by filename.');
       }
       else {
         $this->assertNoPattern("{$pattern}", 'Image is NOT lazyloaded when excluded by filename.');
       }
     }
+  }
+
+  /**
+   * Test functioning of the image style exclude setting.
+   */
+  function testImageStyleExclude() {
+    // Test default rendering of a node.
+    $this->drupalGet("node/{$this->node->nid}");
+    $this->assertLazyloaderEnabled();
+
+    // Enable exclusion option, but don't disable the current image style.
+    $edit['lazyloader_image_styles[medium]'] = 'medium';
+    $this->drupalPost("admin/config/media/lazyloader/exclude", $edit, t('Save configuration'));
+    $this->drupalGet("node/{$this->node->nid}");
+    $this->assertLazyloaderEnabled(TRUE, 'Lazyloader is enabled for <em>medium</em> image style.');
+
+    // Enable exclusion option, now excluding the current image style.
+    $edit['lazyloader_image_styles[medium]'] = FALSE;
+    $edit['lazyloader_image_styles[large]'] = 'large';
+    $this->drupalPost("admin/config/media/lazyloader/exclude", $edit, t('Save configuration'));
+    $this->drupalGet("node/{$this->node->nid}");
+    $this->assertLazyloaderEnabled(FALSE, 'Lazyloader is disabled for <em>medium</em> image style.');
+
+    // @todo test that image style exclusion only affects images using an image
+    // style.
   }
 
 }
