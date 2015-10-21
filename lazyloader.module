@@ -172,7 +172,9 @@ function theme_lazyloader_image($variables) {
   }
 
   // Get the icon width and height for use in the javascript.
-  list($icon_width, $icon_height) = getimagesize(substr(_lazyloader_icon_path(), strlen(base_path())));
+  $icon_path = substr(_lazyloader_icon_path(), strlen(base_path()));
+  // The path will be empty if the user configured the option to show no icon.
+  list($icon_width, $icon_height) = !empty($icon_path) ? getimagesize($icon_path) : array(0, 0);
 
   $settings['lazyloader'] = array(
     'throttle' => variable_get('lazyloader_load_image_delay', LAZYLOADER_LOAD_IMAGE_DELAY),
