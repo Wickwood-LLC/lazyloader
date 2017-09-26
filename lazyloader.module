@@ -81,10 +81,12 @@ function lazyloader_permission() {
 function lazyloader_theme($existing, $type, $theme, $path) {
   $info = array();
 
-  $info['lazyloader_image'] = array(
-    'variables' => $existing['image']['variables'],
-    'function' => 'theme_lazyloader_image',
-  );
+  if (isset($existing['image']['variables'])) {
+    $info['lazyloader_image'] = array(
+      'variables' => $existing['image']['variables'],
+      'function' => 'theme_lazyloader_image',
+    );
+  }
 
   return $info;
 }
