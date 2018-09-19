@@ -17,7 +17,7 @@
 
       // add the loader icon
       if(settings.lazyloader.icon != '') {
-        $('img[data-echo]').each(function() {
+        $('img[data-echo]', context).each(function() {
           var $img = $(this);
           var $icon = $(lazyloader_icon).clone();
           $icon.css({
@@ -43,7 +43,7 @@
 
       // Add a scroll eventlistener to every parent element with overflow:scroll; so we can trigger echo when the
       // element is scrolled.
-      $('img[data-echo], [data-echo-background]').each(function() {
+      $('img[data-echo], [data-echo-background]', context).each(function() {
         $(this).parents().each(function() {
           if ($(this).css('overflow') == 'scroll') {
             $(this).bind('scroll', function() {
