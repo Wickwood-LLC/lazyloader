@@ -9,6 +9,9 @@
 
   Drupal.behaviors.lazyloader = {
     attach: function (context, settings) {
+      if ($(context).is('body.overlay') || $(context).parent('body.overlay').length) {
+        return;
+      }
       if (lazyloader_icon == undefined) {
         lazyloader_icon = new Image();
 
@@ -38,6 +41,14 @@
         callback: function (element, op) {
           // Remove the loader icon when the image is loaded.
           $(element).next('.lazyloader-icon').remove();
+          if (element.complete && element.naturalWidth > 0) {
+            $( document ).trigger( 'lazyloader-image-load', [element, op] );
+          }
+          else {
+            $(element).load(function() {
+              $( document ).trigger( 'lazyloader-image-load', [element, op] );
+            });
+          }
         }
       });
 
