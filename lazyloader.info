@@ -15,3 +15,6 @@ files[] = tests/lazyloader_exclude.test
 files[] = tests/lazyloader_theme.test
 stylesheets[all][] = lazyloader.css
 configure = admin/config/media/lazyloader
+
+version = "7.x-2.0-alpha1"
+project = "lazyloader"
