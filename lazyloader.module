@@ -173,6 +173,10 @@ function theme_lazyloader_image($variables) {
     }
   }
 
+  if (empty($arguments['alt'])) {
+    $arguments['alt'] = ' ';
+  }
+
   // Get the icon width and height for use in the javascript.
   $icon_path = substr(_lazyloader_icon_path(), strlen(base_path()));
   // The path will be empty if the user configured the option to show no icon.
